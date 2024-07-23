@@ -22,8 +22,12 @@
   box-sizing: border-box;
 }
 
-.cell.duplicate {
+.cell.duplicate, .cell.duplicate.square {
   background-color: red;
   color: white;
+}
+
+.cell.square {
+  background-color: lightblue;
 }
 
