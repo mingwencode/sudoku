@@ -8,11 +8,11 @@ function Board() {
     [ 5, 2, 9, 1, 3, 4, 7, 6, 8 ],
     [ 4, 8, 7, 6, 2, 9, 5, 3, 1 ],
     [ 2, 6, 3, 0, 1, 5, 9, 8, 7 ],
-    [ 9, 7, 4, 8, 6, 0, 1, 2, 5 ],
-    [ 8, 5, 1, 7, 9, 2, 6, 4, 3 ],
-    [ 1, 3, 8, 0, 4, 7, 2, 0, 6 ],
+    [ 9, 7, 4, 8, 6, 3, 1, 2, 5 ],
+    [ 8, 5, 1, 7, 9, 0, 6, 4, 3 ],
+    [ 1, 3, 8, 9, 4, 7, 2, 5, 6 ],
     [ 6, 9, 2, 3, 5, 1, 8, 7, 4 ],
-    [ 7, 4, 5, 0, 8, 6, 3, 1, 0 ]
+    [ 7, 4, 5, 2, 8, 6, 3, 1, 9 ]
   ];
 
   const [board, setBoard] = useState(initialBoard)
@@ -20,14 +20,16 @@ function Board() {
   const [colSet, setColSet] = useState(new Set())
   const [squareSet, setSquareSet] = useState(new Set())
   const [isDuplicate, setIsDuplicate] = useState({row: null, col: null, duplicate: false});
+  const [solved, setSolved] = useState(false);
 
 
   const handleCellChange = (value, row, col) => {
     const newBoard = [...board];
     newBoard[row][col] = Number(value) || 0;
     setBoard(newBoard)
-    checkDuplicate(newBoard, row, col);
-
+    if(!checkDuplicate(newBoard, row, col)){
+      checkIfSolved(newBoard)
+    }
   }
 
   const checkDuplicate = (grid, row, col) => {
@@ -35,12 +37,26 @@ function Board() {
 
      if(cell=== 0) {
       setIsDuplicate({row, col, duplicate:false})
-      return;
+      return false;
     }
 
     if(rowSet.get(row)?.has(cell) || colSet.get(col)?.has(cell) || squareSet.get( Math.floor(row / 3) * 3 + Math.floor(col / 3))?.has(cell)) {
       setIsDuplicate({row, col, duplicate:true})
+      return true;
     }
+ }
+
+ const checkIfSolved = (grid) => {
+  let count = 0
+  for(let r of grid) {
+    for(let c of r) {
+      if(c!==0 && c!=='') {
+        count +=1;
+      }
+    }
+  }
+  count === 81 ? setSolved(true) : setSolved(false);
+
  }
 
  useEffect(()=> {
@@ -75,8 +91,9 @@ function Board() {
 setColSet(cols);
 setRowSet(rows)
 setSquareSet(square)
+// checkIfSolved(board)
+},[board])
 
- },[board])
 
   return (
     <div className="board">
@@ -99,7 +116,9 @@ setSquareSet(square)
               />
             ))}
         </div>
+
       ))}
+          {solved && <p>SOLVED</p>}
     </div>
   );
 }
